@@ -1,4 +1,5 @@
-const { getItem, setItem } = localStorage
+const { __proto__ } = localStorage
+const { getItem, setItem } = __proto__
 
 const strategies = {
   String: v => v,
@@ -22,12 +23,13 @@ const strategies = {
   }
 }
 
+const maxLength = 5 * 1024 * 1024 // 5 MB
 const TYPE_PREFIX = '__type_is_'
 const TYPE_SUFFIX = '__'
 const prefixLength = TYPE_PREFIX.length + TYPE_SUFFIX.length
 const regexp = new RegExp(`^${TYPE_PREFIX}(.*?)${TYPE_SUFFIX}`)
 
-localStorage.getItem = function (key) {
+__proto__.getItem = function (key) {
   const value = getItem.call(this, key)
 
   // key 不存在
@@ -52,7 +54,7 @@ localStorage.getItem = function (key) {
   return value
 }
 
-localStorage.setItem = function (key, value) {
+__proto__.setItem = function (key, value) {
   // 可以对 string 类型不做处理
   const type = Object.prototype.toString.call(value).slice(8, -1)
 
@@ -62,3 +64,6 @@ localStorage.setItem = function (key, value) {
 
   return setItem.call(this, key, `${TYPE_PREFIX}${type}${TYPE_SUFFIX}${value}`)
 }
+
+__proto__.size = () =>
+  Object.entries(localStorage).map(item => item.join('')).join('').length / maxLength
