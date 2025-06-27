@@ -1,6 +1,18 @@
-## localStorage with type
+## Overview
+
+Local storage with type.
+
+## Installation
+
+```
+npm i local-storage-with-type -D
+```
+
+## Usage
 
 ```js
+import 'local-storage-with-type'
+
 const getType = v => Object.prototype.toString.call(v).slice(8, -1)
 
 localStorage.setItem('string', 'foo')

@@ -1,0 +1,19 @@
+{
+  "name": "local-storage-with-type",
+  "version": "0.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xNoRain001/local-storage-with-type.git"
+  },
+  "keywords": [
+    "localStorage",
+    "local-storage"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xNoRain001/local-storage-with-type/issues"
+  },
+  "homepage": "https://github.com/xNoRain001/local-storage-with-type#readme"
+}
