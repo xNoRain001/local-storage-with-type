@@ -1,47 +1,51 @@
 const { getItem, setItem } = localStorage
 
 const strategies = {
-  String(value) {
-    return value
-  },
-  Number(value) {
-    return Number(value)
-  },
-  Boolean(value) {
-    return Boolean(value)
-  },
-  Null() {
-    return null
-  },
-  Undefined() {
-    return undefined
-  },
-  BigInt(value) {
-    return BigInt(value)
-  },
-  Array(value) {
-    return JSON.parse(value)
-  },
-  Object(value) {
-    return JSON.parse(value)
-  },
-  Date(value) {
-    return new Date(value)
-  },
-  RegExp(value) {
-    return new RegExp(value)
+  String: v => v,
+  Number: v => Number(v),
+  Boolean: v => v === 'true',
+  Null: () => null,
+  Undefined: () => undefined,
+  BigInt: v => BigInt(v),
+  Array: v => JSON.parse(v),
+  Object: v => JSON.parse(v),
+  Date: v => new Date(v),
+  RegExp(v) {
+    const matched = v.match(/^\/(.*)\/([gimsuy]*)$/)
+
+    if (matched) {
+      const [_, regexp, flags] = matched
+      return new RegExp(regexp, flags)
+    } else {
+      return new RegExp(v)
+    }
   }
 }
 
-const prefixLength = '__type_is___'.length
+const TYPE_PREFIX = '__type_is_'
+const TYPE_SUFFIX = '__'
+const prefixLength = TYPE_PREFIX.length + TYPE_SUFFIX.length
+const regexp = new RegExp(`^${TYPE_PREFIX}(.*?)${TYPE_SUFFIX}`)
 
 localStorage.getItem = function (key) {
   const value = getItem.call(this, key)
-  const withType = value.startsWith('__type_is_')
 
-  if (withType) {
-    const [_, type] = value.match(/__type_is_(.*)__/)
+  // key 不存在
+  if (value === null) {
+    return value
+  }
+
+  if (value.startsWith(TYPE_PREFIX)) {
+    const matched = value.match(regexp)
+
+    // 值以 __type_is_ 开头，但是没有类型
+    if (!matched) {
+      return value
+    }
+
+    const type = matched[1]
     const _value = value.slice(prefixLength + type.length)
+
     return strategies[type](_value)
   }
 
@@ -49,11 +53,12 @@ localStorage.getItem = function (key) {
 }
 
 localStorage.setItem = function (key, value) {
+  // 可以对 string 类型不做处理
   const type = Object.prototype.toString.call(value).slice(8, -1)
 
-  if (/Array|Object/.test(type)) {
+  if (/^(Array|Object)$/.test(type)) {
     value = JSON.stringify(value)
   }
 
-  return setItem.call(this, key, `__type_is_${type}__` + value)
+  return setItem.call(this, key, `${TYPE_PREFIX}${type}${TYPE_SUFFIX}${value}`)
 }
