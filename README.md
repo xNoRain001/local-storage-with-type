@@ -5,7 +5,7 @@ Local storage with type.
 ## Installation
 
 ```
-npm i local-storage-with-type -D
+npm i local-storage-with-type
 ```
 
 ## Usage
